@@ -1,0 +1,114 @@
+namespace ehr.com
+
+asset Record identified by ids {
+    o String ids
+    o String firstName
+    o String lastName
+    o String age
+    o String sex
+    o String allergies
+    o String prescriptionNote
+    o String labReport
+    o String insuranceNotes
+}
+
+asset labReport identified by id {
+    o String id
+    o String labtechId
+    o String doctorId
+    o String notesPic
+}
+
+asset prescriptionNote identified by id{
+    o String id
+    o String doctorId
+    o String notesPic
+}
+
+asset insuranceNotes identified by id {
+    o String id
+    o String insuranceProvider
+    o String Premium
+}
+
+
+
+
+participant Doctor identified by id {
+    o String id
+    o String firstName
+    o String lastName
+    o String specialty
+    o String age
+    o String sex
+}
+
+asset PatientRec identified by id {
+    o String id
+    o String firstName
+    o String lastName
+    o String age
+    o String sex
+    o String allergies
+    o String prescriptionNote
+    o String labReport
+    o String insuranceNotes
+}
+
+participant Technician identified by id {
+    o String id
+    o String firstName
+    o String lastName
+    o String specialty
+}
+
+participant Pharmacist identified by id {
+    o String id
+    o String firstName
+    o String lastName
+    o String location
+}
+
+participant insuranceProvider identified by id {
+    o String id
+    o String name
+    o String location
+}
+
+participant Paramedics identified by id {
+    o String id
+    o String location
+    o String reason
+}
+
+
+
+transaction GetRecord {
+	--> Record record
+}
+
+transaction AddRecord {
+    o String firstName
+    o String lastName
+    o String age
+    o String sex
+    o String allergies
+    o String prescriptionNote
+    o String labReport
+    o String insuranceNotes
+}
+
+transaction RemoveRecord {
+    --> Record record
+}
+
+transaction UpdateRecord {
+    --> Record record
+}
+
+transaction ElevatePermission {
+  --> Record record
+  --> PatientRec owner1
+  --> Doctor owner2
+  --> PatientRec newOwner
+}
