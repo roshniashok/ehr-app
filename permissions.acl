@@ -1,4 +1,28 @@
-rule R2_Elevate {
+rule R5_TechnicianPermission {
+  description: "Appropriate permission for Technician"
+  participant: "ehr.com.Technician"
+  operation: ALL
+  resource: "ehr.com.labReport"
+  action: ALLOW
+}
+
+rule R5_PharmacistPermission {
+  description: "Appropriate permission for Pharmacist"
+  participant: "ehr.com.Pharmacist"
+  operation: ALL
+  resource: "ehr.com.prescriptionNote"
+  action: ALLOW
+}
+
+rule R4_InsuranceProviderPermission {
+  description: "Appropriate permission for Insurance Provider"
+  participant: "ehr.com.insuranceProvider"
+  operation: READ, UPDATE
+  resource: "ehr.com.insuranceNotes"
+  action: ALLOW
+}
+
+rule R3_Elevate {
   description: "Elevating Paramedic permission"
   participant(t): "ehr.com.Paramedics"
   operation: READ, UPDATE
@@ -7,7 +31,7 @@ rule R2_Elevate {
   action: DENY
 }
 
-rule R1_ParamedicsUpdateOnlySingle {
+rule R3_ParamedicsUpdateOnlySingle {
   description: "Paramedics can see and update single Patient record only"
   participant(t): "ehr.com.Paramedics"
   operation: READ, UPDATE
@@ -17,8 +41,7 @@ rule R1_ParamedicsUpdateOnlySingle {
 }
 
 
-
-rule R1_Doctorcanmodify {
+rule R2_Doctorcanmodify {
   description: "Doctor is allowed access"
   participant(t): "ehr.com.Doctor"
   operation: ALL

@@ -48,6 +48,7 @@ participant Doctor identified by id {
     o String specialty
     o String age
     o String sex
+    --> Patient patient
 }
 
 participant Patient identified by id {
@@ -56,10 +57,7 @@ participant Patient identified by id {
     o String lastName
     o String age
     o String sex
-    o String allergies
-    o String prescriptionNote
-    o String labReport
-    o String insuranceNotes
+    --> Record record
 }
 
 participant Technician identified by id {
@@ -67,6 +65,7 @@ participant Technician identified by id {
     o String firstName
     o String lastName
     o String specialty
+    -->Patient patient
 }
 
 participant Pharmacist identified by id {
@@ -74,16 +73,19 @@ participant Pharmacist identified by id {
     o String firstName
     o String lastName
     o String location
+    -->Patient patient
 }
 
 participant insuranceProvider identified by id {
     o String id
     o String name
     o String location
+    --> insuranceNotes insurancenotes
 }
 
 participant Paramedics identified by id {
     o String id
+    -->Patient patientId
     o String location
     o String reason
 }
@@ -118,4 +120,191 @@ transaction UpdateRecord {
 transaction ElevatePermission {
   --> Record record
   --> Paramedics newOwner
+}
+
+transaction AddDoctor {
+	o String id
+    o String firstName
+    o String lastName
+    o String specialty
+    o String age
+    o String sex
+    -->Patient patient
+}
+
+transaction GetDoctor {
+    --> Doctor doctor
+}
+
+transaction RemoveDoctor {
+    -->Doctor doctor
+}
+
+transaction UpdateDoctor {
+    --> Doctor doctor
+}
+
+
+transaction AddPatient {
+    o String id
+    o String firstName
+    o String lastName
+    o String age
+    o String sex
+    --> Record record
+}
+
+transaction GetPatient {
+    --> Patient patient
+}
+
+transaction RemovePatient {
+    --> Patient patient
+}
+
+transaction UpdatePatient {
+    --> Patient patient
+}
+
+
+transaction AddTechnician {
+    o String id
+    o String firstName
+    o String lastName
+    o String specialty
+    -->Patient patient
+}
+
+transaction GetTechnician {
+    --> Technician technician
+}
+
+transaction RemoveTechnician {
+    --> Technician technician
+}
+
+transaction UpdateTechnician {
+    --> Technician technician
+}
+
+
+transaction AddPharmacist {
+    o String id
+    o String firstName
+    o String lastName
+    o String location
+    -->Patient patient
+}
+
+transaction GetPharmacist {
+    --> Pharmacist pharmacist
+}
+
+transaction RemovePharmacist {
+    --> Pharmacist pharmacist
+}
+
+transaction UpdatePharmacist {
+    --> Pharmacist pharmacist
+}
+
+
+transaction AddinsuranceProvider {
+    o String id
+    o String name
+    o String location
+    --> insuranceNotes insurancenotes
+}
+
+transaction GetinsuranceProvider {
+    -->insuranceProvider insuranceprovider
+}
+
+transaction RemoveinsuranceProvider {
+    -->insuranceProvider insuranceprovider
+}
+
+transaction UpdateinsuranceProvider {
+    -->insuranceProvider insuranceprovider
+}
+
+transaction AddParamedic {
+     o String id
+     -->Patient patientId
+     o String location
+     o String reason
+}
+
+transaction GetParamedic {
+    --> Paramedics paramedic
+}
+
+transaction RemoveParamedic {
+    --> Paramedics paramedic
+}
+
+transaction UpdateParamedic {
+    --> Paramedics paramedic
+}
+
+
+transaction AddlabReport {
+    o String id
+    o String labtechId
+    o String doctorId
+    o String notesPic
+    -->Patient owner1
+    -->Doctor owner2
+}
+
+transaction GetlabReport {
+    --> labReport labreport
+}
+
+transaction RemovelabReport {
+    --> labReport labreport
+}
+
+transaction UpdatelabReport {
+    --> labReport labreport
+}
+
+
+transaction AddprescriptionNote {
+    o String id
+    o String doctorId
+    o String notesPic
+    -->Patient owner1
+    -->Doctor owner2
+}
+
+transaction GetprescriptionNote {
+    --> prescriptionNote prescription
+}
+
+transaction RemoveprescriptionNote {
+    --> prescriptionNote prescription
+}
+
+transaction UpdateprescriptionNote {
+    --> prescriptionNote prescription
+}
+
+transaction AddinsuranceNotes {
+    o String id
+    o String insuranceProvider
+    o String Premium
+    -->Patient owner1
+}
+
+transaction GetinsuranceNotes {
+    --> insuranceNotes insurancenotes
+}
+
+transaction RemoveinsuranceNotes {
+    --> insuranceNotes insurancenotes
+}
+
+transaction UpdateinsuranceNotes {
+    --> insuranceNotes insurancenotes
 }
