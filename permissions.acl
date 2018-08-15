@@ -1,14 +1,57 @@
-/**
- * Access control rules for ehr-app
- */
+rule R2_Elevate {
+  description: "Elevating Paramedic permission"
+  participant(t): "ehr.com.Paramedics"
+  operation: READ, UPDATE
+  resource(c): "ehr.com.*"
+  condition: (t.reason != "emergency" )
+  action: DENY
+}
 
- rule Default {
-     description: "Allow all participants access to all resources"
-     participant: "ANY"
-     operation: ALL
-     resource: "ehr.com.*"
-     action: ALLOW
- }
+rule R1_ParamedicsUpdateOnlySingle {
+  description: "Paramedics can see and update single Patient record only"
+  participant(t): "ehr.com.Paramedics"
+  operation: READ, UPDATE
+  resource(v): "ehr.com.*"
+  condition: (t.patientId.getIdentifier() == v.owner1.getIdentifier())
+  action: ALLOW
+}
+
+
+
+rule R1_Doctorcanmodify {
+  description: "Doctor is allowed access"
+  participant(t): "ehr.com.Doctor"
+  operation: ALL
+  resource(c): "ehr.com.*"
+  condition: (c.owner2.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule R1_Patientcanmodify {
+  description: "Patient is allowed access"
+  participant(t): "ehr.com.Patient"
+  operation: ALL
+  resource(c): "ehr.com.*"
+  condition: (c.owner1.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule R1_PatientsCanUpdateTheirOwnRecord {
+  description: "Patients can see and update their own record only"
+  participant(t): "ehr.com.Patient"
+  operation: READ, UPDATE
+  resource(v): "ehr.com.*"
+  condition: (v.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule AllAccess {
+  description: "AllAccess - grant everything to everybody"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
 
 rule SystemACL {
   description:  "System ACL to permit all access"
