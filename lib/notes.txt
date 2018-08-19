@@ -1,0 +1,7 @@
+curl -X POST  --header 'Content-Type: application/json' --header 'Accept: application/json'  https://localhost:3000/api/AddDoctor -d '{ "$class": "ehr.com.AddDoctor","id": "2", "firstName": "rosh", "lastName": "ashok","specialty": "paeds","age": "22", "sex": "F","patient": "ehr.com.Patient#1"}'
+    "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/ehr-app.bna",
+    "scripts": {
+      "pretest": "npm run lint",
+      "lint": "eslint .",
+      "test": "nyc mocha -t 0 test/*.js && cucumber-js"
+    },

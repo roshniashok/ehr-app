@@ -1,15 +1,14 @@
 {
   "engines": {
-    "composer": "^0.19.13"
+    "composer": "^0.20.0"
   },
   "name": "ehr-app",
-  "version": "0.0.3",
+  "version": "0.0.1",
   "description": "a sample ehr app",
   "scripts": {
     "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/ehr-app.bna",
     "pretest": "npm run lint",
-    "lint": "eslint .",
-    "test": "nyc mocha -t 0 test/*.js && cucumber-js"
+    "lint": "eslint ."
   },
   "keywords": [
     "composer",
@@ -19,18 +18,36 @@
   "email": "rosh813@gmail.com",
   "license": "Apache-2.0",
   "devDependencies": {
-    "composer-admin": "^0.19.13",
-    "composer-cli": "^0.19.13",
-    "composer-client": "^0.19.13",
-    "composer-common": "^0.19.13",
-    "composer-connector-embedded": "^0.19.13",
-    "composer-cucumber-steps": "^0.19.13",
+    "@types/crypto-js": "^3.1.43",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^8.0.0",
     "chai": "latest",
     "chai-as-promised": "latest",
+    "composer-admin": "^0.20.0",
+    "composer-cli": "^0.20.0",
+    "composer-client": "^0.20.0",
+    "composer-common": "^0.20.0",
+    "composer-connector-embedded": "^0.20.0",
+    "composer-cucumber-steps": "^0.20.0",
+    "crypto-js": "^3.1.9-1",
     "cucumber": "^2.2.0",
     "eslint": "latest",
-    "nyc": "latest",
+    "eslint-plugin-import": "^2.14.0",
     "mkdirp": "latest",
-    "mocha": "latest"
+    "mocha": "latest",
+    "nyc": "latest"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ]
+        }
+      ]
+    ]
   }
 }
