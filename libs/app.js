@@ -4,13 +4,24 @@ var bodyParser = require('body-parser');
 //var passport = require('passport');
 
 var libs = process.cwd() + '/libs/';
-require(libs + 'auth/auth');
+//require(libs + 'auth/auth');
 
 var config = require('./config');
 var log = require('./log')(module);
 //var oauth2 = require('./auth/oauth2');
 
 var ledger = require('./routes/ledger')
+var doctor = require('./routes/doctor')
+var patient = require('./routes/patient')
+var technician = require('./routes/technician')
+var pharmacist = require('./routes/pharmacist')
+var paramedic = require('./routes/paramedic')
+var insuranceProvider = require('./routes/insuranceProvider')
+var insuranceNotes = require('./routes/insuranceNotes')
+var prescriptionNote = require('./routes/prescriptionNote')
+var record = require('./routes/record')
+var labReport = require('./routes/labReport')
+
 //var users = require('./routes/users');
 //var articles = require('./routes/articles');
 
@@ -22,6 +33,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 app.use('/ledger', ledger)
+app.use('/doctor', doctor)
+app.use('/patient', patient)
+app.use('/technician', technician)
+app.use('/pharmacist', pharmacist)
+app.use('/paramedic', paramedic)
+app.use('/insuranceProvider', insuranceProvider)
+app.use('/insuranceNotes', insuranceNotes)
+app.use('/prescriptionNote', prescriptionNote)
+app.use('/record', record)
+app.use('/labReport', labReport)
+
+
+
 //app.use('/api/users', users);
 //app.use('/api/articles', articles);
 //app.use('/api/oauth/token', oauth2.token);

@@ -56,27 +56,35 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Person")
+              return participantRegistry("ehr.com.Pharmacist")
             })
 
           .then(participantRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-              owner = factory.newResource('ehr.com', 'Person', req.body.personId);
-              //owner.firstName = req.body.firstName;
+              pharmacist = factory.newResource('ehr.com', 'Pharmacist', req.body.id);
+              console.log("HIII")
+              console.log(pharmacist)
+              //pharmacist.firstName = req.body.firstName;
               var firstnameenc = encryptField(req.body.firstName);
               var lastnameenc = encryptField(req.body.lastName);
-              owner.firstName = firstnameenc;
-              owner.lastName = lastnameenc;
-
-              return participantRegistry.add(owner);
+              var locationenc = encryptField(req.body.location);
+              console.log("encrypting...")
+              pharmacist.firstName = firstnameenc;
+              pharmacist.lastName = lastnameenc;
+              pharmacist.location = locationenc;
+              console.log("blah")
+              pharmacist.patient = factory.newRelationship('ehr.com', 'Patient', req.body.patient);
+              console.log(pharmacist.patient)
+              console.log("huh?")
+              return participantRegistry.add(pharmacist);
            })
 
             .then((err) => {
-              return issueIdentity("ehr.com", "Person", req.body.personId, req.body.personId + "_" + req.body.firstName);
+              return issueIdentity("ehr.com", "Pharmacist", req.body.id, req.body.id + "_" + req.body.firstName);
             })
 
             .then(identity => {
-              return adminConnection.importCard(req.body.personId, getIdCard(createMetaData(identity)));
+              return adminConnection.importCard(req.body.id, getIdCard(createMetaData(identity)));
             })
 
             .then(() => {
@@ -85,9 +93,7 @@ router.post('/',  function (req, res) {
 
             .then(() => {
               return res.json({
-                status: 'OK, done!',
-                firstName : owner.firstName,
-                lastName : owner.lastName
+                status: 'OK, done!'
               });
         })
         .catch(errs => {
@@ -103,14 +109,14 @@ router.post('/',  function (req, res) {
 router.get('/:id', function (req, res) {
   let exists;
   let assets;
-  let person;
+  let pharmacist;
   console.log("dfdk")
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
   return businessNetworkConnection.connect(req.params.id)
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
-            'ehr.com.Person');
+            'ehr.com.Pharmacist');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
@@ -124,35 +130,37 @@ router.get('/:id', function (req, res) {
       })
       .then((result) => {
           if (exists) {
-            person = businessNetworkConnection.getBusinessNetwork()
+            pharmacist = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
                        .toJSON(result);
-            var decryptedfirstName = decryptField(person.firstName)
-            var decryptedlastName = decryptField(person.lastName)
-            person.firstName=decryptedfirstName
-            person.lastName=decryptedlastName
+            var decryptedfirstName = decryptField(pharmacist.firstName)
+            var decryptedlastName = decryptField(pharmacist.lastName)
+            var decryptedlocation = decryptField(pharmacist.location)
+
+            pharmacist.firstName=decryptedfirstName
+            pharmacist.lastName=decryptedlastName
+            pharmacist.location=decryptedlocation
 
           }
-
           return businessNetworkConnection.disconnect();
         })
         .then(() => {
           if (exists) {
             res.json({
-              body : person,
-              message: 'Person has been retrieved successfully',
+              body : pharmacist,
+              message: 'pharmacist has been retrieved successfully',
               dev_message: 'Success'
             });
           } else {
             res.json({
-              message: 'There is no such person'
+              message: 'There is no such pharmacist'
             });
           }
         })
         .catch(err => {
           return res.json({
             error: {
-              message: err
+              message: err.toString()
             }
           });
 });
@@ -162,33 +170,36 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Person")
+        return participantRegistry("ehr.com.Pharmacist")
       })
 
     .then(participantRegistry => {
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-      owner = factory.newResource('ehr.com', 'Person', req.params.id);
+      const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+      pharmacist = factory.newResource('ehr.com', 'Pharmacist', req.params.id);
       var firstnameenc = encryptField(req.body.firstName);
       var lastnameenc = encryptField(req.body.lastName);
-      owner.firstName = firstnameenc;
-      owner.lastName = lastnameenc;
-      return participantRegistry.update(owner);
+      var locationenc = encryptField(req.body.location);
+
+      pharmacist.firstName = firstnameenc;
+      pharmacist.lastName = lastnameenc;
+      pharmacist.location = locationenc;
+      pharmacist.patient = factory.newRelationship('ehr.com', 'Patient', req.body.patient);
+
+      return participantRegistry.update(pharmacist);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();
     })
     .then(() => {
       return res.json({
-        status: 'OK, done!',
-        firstName : owner.firstName,
-        lastName : owner.lastName
+        status: 'OK, done!'
 
     });
     })
     .catch(errs => {
           return res.json({
             error: {
-              message: 'Failed to update record'
+              message: errs.toString()
             }
           });
     });

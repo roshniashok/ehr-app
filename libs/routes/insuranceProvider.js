@@ -56,27 +56,30 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Person")
+              return participantRegistry("ehr.com.insuranceProvider")
             })
 
           .then(participantRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-              owner = factory.newResource('ehr.com', 'Person', req.body.personId);
-              //owner.firstName = req.body.firstName;
-              var firstnameenc = encryptField(req.body.firstName);
-              var lastnameenc = encryptField(req.body.lastName);
-              owner.firstName = firstnameenc;
-              owner.lastName = lastnameenc;
+              insuranceprovider = factory.newResource('ehr.com', 'insuranceProvider', req.body.insuranceProviderId);
+              //insuranceprovider.firstName = req.body.firstName;
+              console.log(req.body.name);
+              var nameenc = encryptField(req.body.name);
+              var locationenc = encryptField(req.body.location);
 
-              return participantRegistry.add(owner);
+              insuranceprovider.name = nameenc;
+              insuranceprovider.location = locationenc;
+              console.log("Posting..");
+              return participantRegistry.add(insuranceprovider);
+              console.log("Posted...")
            })
 
             .then((err) => {
-              return issueIdentity("ehr.com", "Person", req.body.personId, req.body.personId + "_" + req.body.firstName);
+              return issueIdentity("ehr.com", "insuranceProvider", req.body.insuranceProviderId, req.body.insuranceProviderId + "_" + req.body.name);
             })
 
             .then(identity => {
-              return adminConnection.importCard(req.body.personId, getIdCard(createMetaData(identity)));
+              return adminConnection.importCard(req.body.insuranceProviderId, getIdCard(createMetaData(identity)));
             })
 
             .then(() => {
@@ -86,8 +89,7 @@ router.post('/',  function (req, res) {
             .then(() => {
               return res.json({
                 status: 'OK, done!',
-                firstName : owner.firstName,
-                lastName : owner.lastName
+                body: insuranceprovider
               });
         })
         .catch(errs => {
@@ -103,14 +105,13 @@ router.post('/',  function (req, res) {
 router.get('/:id', function (req, res) {
   let exists;
   let assets;
-  let person;
-  console.log("dfdk")
+  let insuranceprovider;
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
   return businessNetworkConnection.connect(req.params.id)
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
-            'ehr.com.Person');
+            'ehr.com.insuranceProvider');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
@@ -124,35 +125,38 @@ router.get('/:id', function (req, res) {
       })
       .then((result) => {
           if (exists) {
-            person = businessNetworkConnection.getBusinessNetwork()
+            insuranceprovider = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
                        .toJSON(result);
-            var decryptedfirstName = decryptField(person.firstName)
-            var decryptedlastName = decryptField(person.lastName)
-            person.firstName=decryptedfirstName
-            person.lastName=decryptedlastName
 
+                       console.log(insuranceprovider.name);
+            var decryptedname = decryptField(insuranceprovider.name)
+            var decryptedlocation = decryptField(insuranceprovider.location)
+
+
+console.log(decryptedname)
+            insuranceprovider.name=decryptedname
+            insuranceprovider.location=decryptedlocation
           }
-
           return businessNetworkConnection.disconnect();
         })
         .then(() => {
           if (exists) {
             res.json({
-              body : person,
-              message: 'Person has been retrieved successfully',
+              body : insuranceprovider,
+              message: 'insuranceprovider has been retrieved successfully',
               dev_message: 'Success'
             });
           } else {
             res.json({
-              message: 'There is no such person'
+              message: 'There is no such insuranceprovider'
             });
           }
         })
         .catch(err => {
           return res.json({
             error: {
-              message: err
+              message: err.toString()
             }
           });
 });
@@ -162,27 +166,27 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Person")
+        return participantRegistry("ehr.com.insuranceProvider")
       })
 
     .then(participantRegistry => {
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-      owner = factory.newResource('ehr.com', 'Person', req.params.id);
-      var firstnameenc = encryptField(req.body.firstName);
-      var lastnameenc = encryptField(req.body.lastName);
-      owner.firstName = firstnameenc;
-      owner.lastName = lastnameenc;
-      return participantRegistry.update(owner);
+      const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+      insuranceprovider = factory.newResource('ehr.com', 'insuranceProvider', req.params.id);
+      var nameenc = encryptField(req.body.name);
+      var locationenc = encryptField(req.body.location);
+
+      insuranceprovider.name = nameenc;
+      insuranceprovider.location = locationenc;
+      console.log("Posting..");
+      return participantRegistry.add(insuranceprovider);
+      return participantRegistry.update(insuranceprovider);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();
     })
     .then(() => {
       return res.json({
-        status: 'OK, done!',
-        firstName : owner.firstName,
-        lastName : owner.lastName
-
+        status: 'OK, done!'
     });
     })
     .catch(errs => {

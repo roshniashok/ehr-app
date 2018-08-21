@@ -14,15 +14,9 @@ participant Person identified by personId {
   o String lastName
 }
 
-transaction RegisterPropertyForSale {
-  --> LandTitle title
-}
 
-
-
-
-asset Record identified by ids {
-  	o String ids
+asset Record identified by RecordId {
+  	o String RecordId
     o String firstName
     o String lastName
     o String age
@@ -35,41 +29,43 @@ asset Record identified by ids {
     -->Doctor owner2
 }
 
-asset labReport identified by id {
-    o String id
+asset labReport identified by labReportId {
+    o String labReportId
     o String labtechId
-    o String doctorId
-    o String notesPic
+    o String doctorName
+    o String patientName
+    o String notes
     -->Patient owner1
     -->Doctor owner2
 }
 
-asset prescriptionNote identified by id{
-    o String id
-    o String doctorId
-    o String notesPic
+asset prescriptionNote identified by prescriptionNoteId{
+    o String prescriptionNoteId
+    o String doctorName
+    o String patientName
+    o String notes
     -->Patient owner1
     -->Doctor owner2
 }
 
-asset insuranceNotes identified by id {
-    o String id
+asset insuranceNotes identified by insuranceNotesId {
+    o String insuranceNotesId
     o String insuranceProvider
     o String Premium
     -->Patient owner1
+    --> insuranceProvider owner2
 }
 
 
 
 
-participant Doctor identified by id {
-    o String id
+participant Doctor identified by doctorId {
+    o String doctorId
     o String firstName
     o String lastName
     o String specialty
     o String age
     o String sex
-    --> Patient patient
 }
 
 participant Patient identified by id {
@@ -78,7 +74,8 @@ participant Patient identified by id {
     o String lastName
     o String age
     o String sex
-    --> Record record
+    --> Doctor doctor
+
 }
 
 participant Technician identified by id {
@@ -97,235 +94,15 @@ participant Pharmacist identified by id {
     -->Patient patient
 }
 
-participant insuranceProvider identified by id {
-    o String id
+participant insuranceProvider identified by insuranceProviderId {
+    o String insuranceProviderId
     o String name
     o String location
-    --> insuranceNotes insurancenotes
 }
 
-participant Paramedics identified by id {
-    o String id
-    -->Patient patientId
+participant Paramedics identified by paramedicId {
+    o String paramedicId
     o String location
     o String reason
-}
-
-
-
-transaction GetRecord {
-	--> Record record
-}
-
-transaction AddRecord {
-    o String firstName
-    o String lastName
-    o String age
-    o String sex
-    o String allergies
-    -->prescriptionNote prescription
-    -->labReport report
-    -->insuranceNotes insurance
-   	-->Patient owner1
-    -->Doctor owner2
-}
-
-transaction RemoveRecord {
-    --> Record record
-}
-
-transaction UpdateRecord {
-    --> Record record
-}
-
-transaction ElevatePermission {
-  --> Record record
-  --> Paramedics newOwner
-}
-
-transaction AddDoctor {
-	o String id
-    o String firstName
-    o String lastName
-    o String specialty
-    o String age
-    o String sex
-    -->Patient patient
-}
-
-transaction GetDoctor {
-    --> Doctor doctor
-}
-
-transaction RemoveDoctor {
-    -->Doctor doctor
-}
-
-transaction UpdateDoctor {
-    --> Doctor doctor
-}
-
-
-transaction AddPatient {
-    o String id
-    o String firstName
-    o String lastName
-    o String age
-    o String sex
-    --> Record record
-}
-
-transaction GetPatient {
-    --> Patient patient
-}
-
-transaction RemovePatient {
-    --> Patient patient
-}
-
-transaction UpdatePatient {
-    --> Patient patient
-}
-
-
-transaction AddTechnician {
-    o String id
-    o String firstName
-    o String lastName
-    o String specialty
-    -->Patient patient
-}
-
-transaction GetTechnician {
-    --> Technician technician
-}
-
-transaction RemoveTechnician {
-    --> Technician technician
-}
-
-transaction UpdateTechnician {
-    --> Technician technician
-}
-
-
-transaction AddPharmacist {
-    o String id
-    o String firstName
-    o String lastName
-    o String location
-    -->Patient patient
-}
-
-transaction GetPharmacist {
-    --> Pharmacist pharmacist
-}
-
-transaction RemovePharmacist {
-    --> Pharmacist pharmacist
-}
-
-transaction UpdatePharmacist {
-    --> Pharmacist pharmacist
-}
-
-
-transaction AddinsuranceProvider {
-    o String id
-    o String name
-    o String location
-    --> insuranceNotes insurancenotes
-}
-
-transaction GetinsuranceProvider {
-    -->insuranceProvider insuranceprovider
-}
-
-transaction RemoveinsuranceProvider {
-    -->insuranceProvider insuranceprovider
-}
-
-transaction UpdateinsuranceProvider {
-    -->insuranceProvider insuranceprovider
-}
-
-transaction AddParamedic {
-     o String id
-     -->Patient patientId
-     o String location
-     o String reason
-}
-
-transaction GetParamedic {
-    --> Paramedics paramedic
-}
-
-transaction RemoveParamedic {
-    --> Paramedics paramedic
-}
-
-transaction UpdateParamedic {
-    --> Paramedics paramedic
-}
-
-
-transaction AddlabReport {
-    o String id
-    o String labtechId
-    o String doctorId
-    o String notesPic
-    -->Patient owner1
-    -->Doctor owner2
-}
-
-transaction GetlabReport {
-    --> labReport labreport
-}
-
-transaction RemovelabReport {
-    --> labReport labreport
-}
-
-transaction UpdatelabReport {
-    --> labReport labreport
-}
-
-
-transaction AddprescriptionNote {
-    o String id
-    o String doctorId
-    o String notesPic
-    -->Patient owner1
-    -->Doctor owner2
-}
-
-transaction GetprescriptionNote {
-    --> prescriptionNote prescription
-}
-
-transaction RemoveprescriptionNote {
-    --> prescriptionNote prescription
-}
-
-transaction UpdateprescriptionNote {
-    --> prescriptionNote prescription
-}
-
-transaction AddinsuranceNotes {
-    o String id
-    o String insuranceProvider
-    o String Premium
-    -->Patient owner1
-}
-
-transaction GetinsuranceNotes {
-    --> insuranceNotes insurancenotes
-}
-
-transaction RemoveinsuranceNotes {
-    --> insuranceNotes insurancenotes
-}
-
-transaction UpdateinsuranceNotes {
-    --> insuranceNotes insurancenotes
+    -->Patient patientId
 }

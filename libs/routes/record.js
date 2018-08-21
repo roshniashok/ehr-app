@@ -16,7 +16,7 @@ const adminConnection = new AdminConnection();
 const businessNetworkName = 'ehr-app';
 const connectionProfile = require('./sample.json');
 
-const cardName = "admin@ehr-app";
+const cardName = "01";
 const businessNetworkIdentifier = "ehr-app@0.0.1";
 
 function encryptField(dataToEncrypt) {
@@ -56,27 +56,42 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Person")
+              return participantRegistry("ehr.com.Record")
             })
 
           .then(participantRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-              owner = factory.newResource('ehr.com', 'Person', req.body.personId);
-              //owner.firstName = req.body.firstName;
+              record = factory.newResource('ehr.com', 'Record', req.body.RecordId);
+              //record.firstName = req.body.firstName;
               var firstnameenc = encryptField(req.body.firstName);
               var lastnameenc = encryptField(req.body.lastName);
-              owner.firstName = firstnameenc;
-              owner.lastName = lastnameenc;
+              var ageenc = encryptField(req.body.age);
+              var sexenc = encryptField(req.body.sex);
+              var allergiesenc = encryptField(req.body.allergies);
+              record.firstName = firstnameenc;
+              record.lastName = lastnameenc;
+              record.age = ageenc;
+              record.sex = sexenc;
+              record.allergies=allergiesenc;
+              record.prescription = factory.newRelationship('ehr.com', 'prescriptionNote', req.body.prescription);
+              record.report = factory.newRelationship('ehr.com', 'labReport', req.body.report);
+              record.insurance = factory.newRelationship('ehr.com', 'insuranceNotes', req.body.insurance);
+              record.owner1 = factory.newRelationship('ehr.com', 'Record', req.body.owner1);
+              record.owner2 = factory.newRelationship('ehr.com', 'Doctor', req.body.owner2);
 
-              return participantRegistry.add(owner);
+              console.log("Posting..");
+              //record.record = factory.newResource('ehr.com', 'Record', req.body.id);
+              return participantRegistry.add(record);
+              console.log(record)
+              console.log("Posted...")
            })
 
             .then((err) => {
-              return issueIdentity("ehr.com", "Person", req.body.personId, req.body.personId + "_" + req.body.firstName);
+              return issueIdentity("ehr.com", "Record", req.body.RecordId, req.body.RecordId + "_" + req.body.firstName);
             })
 
             .then(identity => {
-              return adminConnection.importCard(req.body.personId, getIdCard(createMetaData(identity)));
+              return adminConnection.importCard(req.body.RecordId, getIdCard(createMetaData(identity)));
             })
 
             .then(() => {
@@ -86,8 +101,8 @@ router.post('/',  function (req, res) {
             .then(() => {
               return res.json({
                 status: 'OK, done!',
-                firstName : owner.firstName,
-                lastName : owner.lastName
+                firstName : record.firstName,
+                lastName : record.lastName
               });
         })
         .catch(errs => {
@@ -103,14 +118,13 @@ router.post('/',  function (req, res) {
 router.get('/:id', function (req, res) {
   let exists;
   let assets;
-  let person;
-  console.log("dfdk")
+  let record;
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
-  return businessNetworkConnection.connect(req.params.id)
+  return businessNetworkConnection.connect(cardName)
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
-            'ehr.com.Person');
+            'ehr.com.Record');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
@@ -124,35 +138,42 @@ router.get('/:id', function (req, res) {
       })
       .then((result) => {
           if (exists) {
-            person = businessNetworkConnection.getBusinessNetwork()
+            record = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
                        .toJSON(result);
-            var decryptedfirstName = decryptField(person.firstName)
-            var decryptedlastName = decryptField(person.lastName)
-            person.firstName=decryptedfirstName
-            person.lastName=decryptedlastName
+            var decryptedfirstName = decryptField(record.firstName)
+            var decryptedlastName = decryptField(record.lastName)
 
+            var decryptedage = decryptField(record.age)
+            var decryptedsex = decryptField(record.sex)
+            var decryptedallergies = decryptField(record.allergies)
+            //var decrypteddoctor = decryptField(record.doctor)
+            record.firstName=decryptedfirstName
+            record.lastName=decryptedlastName
+            record.age=decryptedage
+            record.sex=decryptedsex
+            record.allergies=decryptedallergies
+            //record.doctor=decrypteddoctor
           }
-
           return businessNetworkConnection.disconnect();
         })
         .then(() => {
           if (exists) {
             res.json({
-              body : person,
-              message: 'Person has been retrieved successfully',
+              body : record,
+              message: 'record has been retrieved successfully',
               dev_message: 'Success'
             });
           } else {
             res.json({
-              message: 'There is no such person'
+              message: 'There is no such record'
             });
           }
         })
         .catch(err => {
           return res.json({
             error: {
-              message: err
+              message: err.toString()
             }
           });
 });
@@ -162,33 +183,42 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Person")
+        return participantRegistry("ehr.com.Record")
       })
 
     .then(participantRegistry => {
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-      owner = factory.newResource('ehr.com', 'Person', req.params.id);
+      const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+      record = factory.newResource('ehr.com', 'Record', req.params.id);
       var firstnameenc = encryptField(req.body.firstName);
       var lastnameenc = encryptField(req.body.lastName);
-      owner.firstName = firstnameenc;
-      owner.lastName = lastnameenc;
-      return participantRegistry.update(owner);
+      var ageenc = encryptField(req.body.age);
+      var sexenc = encryptField(req.body.sex);
+      var allergiesenc = encryptField(req.body.allergies);
+      record.firstName = firstnameenc;
+      record.lastName = lastnameenc;
+      record.age = ageenc;
+      record.sex = sexenc;
+      record.allergies=allergiesenc;
+      record.prescription = factory.newRelationship('ehr.com', 'prescriptionNote', req.body.prescription);
+      record.report = factory.newRelationship('ehr.com', 'labReport', req.body.report);
+      record.insurance = factory.newRelationship('ehr.com', 'insuranceNotes', req.body.insurance);
+      record.owner1 = factory.newRelationship('ehr.com', 'Record', req.body.owner1);
+      record.owner2 = factory.newRelationship('ehr.com', 'Doctor', req.body.owner2);
+
+      return participantRegistry.update(record);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();
     })
     .then(() => {
       return res.json({
-        status: 'OK, done!',
-        firstName : owner.firstName,
-        lastName : owner.lastName
-
+        status: 'OK, done!'
     });
     })
     .catch(errs => {
           return res.json({
             error: {
-              message: 'Failed to update record'
+              message: errs.toString()
             }
           });
     });

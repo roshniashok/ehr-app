@@ -28,13 +28,13 @@ function decryptField(dataToDecrypt) {
   return CryptoJS.AES.decrypt(dataToDecrypt, 'secret key 123').toString(CryptoJS.enc.Utf8);
 }
 
-function participantRegistry(registryName) {
-  return businessNetworkConnection.getParticipantRegistry(registryName);
+function assetRegistry(registryName) {
+  return businessNetworkConnection.getAssetRegistry(registryName);
 }
 
 
-function issueIdentity(namespace, participant, id, cardName) {
-  return businessNetworkConnection.issueIdentity(namespace + '.' + participant + '#' + id, cardName)
+function issueIdentity(namespace, asset, id, cardName) {
+  return businessNetworkConnection.issueIdentity(namespace + '.' + asset + '#' + id, cardName)
 }
 
 
@@ -56,27 +56,31 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Person")
+              return assetRegistry("ehr.com.labReport")
             })
 
-          .then(participantRegistry => {
+          .then(assetRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-              owner = factory.newResource('ehr.com', 'Person', req.body.personId);
-              //owner.firstName = req.body.firstName;
-              var firstnameenc = encryptField(req.body.firstName);
-              var lastnameenc = encryptField(req.body.lastName);
-              owner.firstName = firstnameenc;
-              owner.lastName = lastnameenc;
-
-              return participantRegistry.add(owner);
+              labreport = factory.newResource('ehr.com', 'labReport', req.body.labReportId);
+              var labtechIdenc=encryptField(req.body.labtechId);
+              var doctorNameenc = encryptField(req.body.doctorName);
+              var patientNameenc = encryptField(req.body.patientName);
+              var notesenc = encryptField(req.body.notes);
+              labreport.labtechId=labtechIdenc;
+              labreport.doctorName = doctorNameenc;
+              labreport.patientName = patientNameenc;
+              labreport.notes = notesenc;
+              labreport.owner1 = factory.newRelationship('ehr.com', 'Patient', req.body.owner1);
+              labreport.owner2 = factory.newRelationship('ehr.com', 'Doctor', req.body.owner2);
+              return assetRegistry.add(labreport);
            })
 
             .then((err) => {
-              return issueIdentity("ehr.com", "Person", req.body.personId, req.body.personId + "_" + req.body.firstName);
+              return issueIdentity("ehr.com", "labReport", req.body.labReportId, req.body.labReportId + "_" + req.body.firstName);
             })
 
             .then(identity => {
-              return adminConnection.importCard(req.body.personId, getIdCard(createMetaData(identity)));
+              return adminConnection.importCard(req.body.labReportId, getIdCard(createMetaData(identity)));
             })
 
             .then(() => {
@@ -85,9 +89,7 @@ router.post('/',  function (req, res) {
 
             .then(() => {
               return res.json({
-                status: 'OK, done!',
-                firstName : owner.firstName,
-                lastName : owner.lastName
+                status: 'OK, done!'
               });
         })
         .catch(errs => {
@@ -103,14 +105,14 @@ router.post('/',  function (req, res) {
 router.get('/:id', function (req, res) {
   let exists;
   let assets;
-  let person;
+  let labreport;
   console.log("dfdk")
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
   return businessNetworkConnection.connect(req.params.id)
     .then(() => {
-        return businessNetworkConnection.getParticipantRegistry(
-            'ehr.com.Person');
+        return businessNetworkConnection.getAssetRegistry(
+            'ehr.com.labReport');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
@@ -124,35 +126,38 @@ router.get('/:id', function (req, res) {
       })
       .then((result) => {
           if (exists) {
-            person = businessNetworkConnection.getBusinessNetwork()
+            labreport = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
                        .toJSON(result);
-            var decryptedfirstName = decryptField(person.firstName)
-            var decryptedlastName = decryptField(person.lastName)
-            person.firstName=decryptedfirstName
-            person.lastName=decryptedlastName
+            var decryptedlabtechId = decryptField(labreport.labtechId)
+            var decrypteddoctorName = decryptField(labreport.doctorName)
+            var decryptedpatientName = decryptField(labreport.patientName)
+            var decryptednotes = decryptField(labreport.notes)
 
+            labreport.labtechId=decryptedlabtechId
+            labreport.doctorName=decrypteddoctorName
+            labreport.patientName=decryptedpatientName
+            labreport.notes=decryptednotes
           }
-
           return businessNetworkConnection.disconnect();
         })
         .then(() => {
           if (exists) {
             res.json({
-              body : person,
-              message: 'Person has been retrieved successfully',
+              body : labreport,
+              message: 'labreport has been retrieved successfully',
               dev_message: 'Success'
             });
           } else {
             res.json({
-              message: 'There is no such person'
+              message: 'There is no such labreport'
             });
           }
         })
         .catch(err => {
           return res.json({
             error: {
-              message: err
+              message: err.toString()
             }
           });
 });
@@ -162,33 +167,37 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Person")
+        return assetRegistry("ehr.com.labReport")
       })
 
-    .then(participantRegistry => {
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-      owner = factory.newResource('ehr.com', 'Person', req.params.id);
-      var firstnameenc = encryptField(req.body.firstName);
-      var lastnameenc = encryptField(req.body.lastName);
-      owner.firstName = firstnameenc;
-      owner.lastName = lastnameenc;
-      return participantRegistry.update(owner);
+    .then(assetRegistry => {
+      const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+      labreport = factory.newResource('ehr.com', 'labReport', req.params.id);
+      var labtechIdenc=encryptField(req.body.labtechId);
+      var doctorNameenc = encryptField(req.body.doctorName);
+      var patientNameenc = encryptField(req.body.patientName);
+      var notesenc = encryptField(req.body.notes);
+      labreport.labtechId=labtechIdenc;
+      labreport.doctorName = doctorNameenc;
+      labreport.patientName = patientNameenc;
+      labreport.notes = notesenc;
+      labreport.owner1 = factory.newRelationship('ehr.com', 'Patient', req.body.owner1);
+      labreport.owner2 = factory.newRelationship('ehr.com', 'Doctor', req.body.owner2);
+      return assetRegistry.update(labreport);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();
     })
     .then(() => {
       return res.json({
-        status: 'OK, done!',
-        firstName : owner.firstName,
-        lastName : owner.lastName
+        status: 'OK, done!'
 
     });
     })
     .catch(errs => {
           return res.json({
             error: {
-              message: 'Failed to update record'
+              message: errs.toString()
             }
           });
     });

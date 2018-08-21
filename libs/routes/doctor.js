@@ -56,27 +56,33 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Person")
+              return participantRegistry("ehr.com.Doctor")
             })
 
           .then(participantRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-              owner = factory.newResource('ehr.com', 'Person', req.body.personId);
-              //owner.firstName = req.body.firstName;
+              doctor = factory.newResource('ehr.com', 'Doctor', req.body.doctorId);
+              //doctor.firstName = req.body.firstName;
               var firstnameenc = encryptField(req.body.firstName);
               var lastnameenc = encryptField(req.body.lastName);
-              owner.firstName = firstnameenc;
-              owner.lastName = lastnameenc;
-
-              return participantRegistry.add(owner);
+              var specialtyenc = encryptField(req.body.specialtyenc);
+              var ageenc = encryptField(req.body.age);
+              var sexenc = encryptField(req.body.sex);
+            
+              doctor.firstName = firstnameenc;
+              doctor.lastName = lastnameenc;
+              doctor.specialty = specialtyenc;
+              doctor.age = ageenc;
+              doctor.sex = sexenc;
+              return participantRegistry.add(doctor);
            })
 
             .then((err) => {
-              return issueIdentity("ehr.com", "Person", req.body.personId, req.body.personId + "_" + req.body.firstName);
+              return issueIdentity("ehr.com", "Doctor", req.body.doctorId, req.body.doctorId + "_" + req.body.firstName);
             })
 
             .then(identity => {
-              return adminConnection.importCard(req.body.personId, getIdCard(createMetaData(identity)));
+              return adminConnection.importCard(req.body.doctorId, getIdCard(createMetaData(identity)));
             })
 
             .then(() => {
@@ -86,8 +92,8 @@ router.post('/',  function (req, res) {
             .then(() => {
               return res.json({
                 status: 'OK, done!',
-                firstName : owner.firstName,
-                lastName : owner.lastName
+                firstName : doctor.firstName,
+                lastName : doctor.lastName
               });
         })
         .catch(errs => {
@@ -103,14 +109,14 @@ router.post('/',  function (req, res) {
 router.get('/:id', function (req, res) {
   let exists;
   let assets;
-  let person;
+  let doctor;
   console.log("dfdk")
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
   return businessNetworkConnection.connect(req.params.id)
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
-            'ehr.com.Person');
+            'ehr.com.Doctor');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
@@ -124,28 +130,33 @@ router.get('/:id', function (req, res) {
       })
       .then((result) => {
           if (exists) {
-            person = businessNetworkConnection.getBusinessNetwork()
+            doctor = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
                        .toJSON(result);
-            var decryptedfirstName = decryptField(person.firstName)
-            var decryptedlastName = decryptField(person.lastName)
-            person.firstName=decryptedfirstName
-            person.lastName=decryptedlastName
+            var decryptedfirstName = decryptField(doctor.firstName)
+            var decryptedlastName = decryptField(doctor.lastName)
+            var decryptedspecialty = decryptField(doctor.specialty)
+            var decryptedage = decryptField(doctor.age)
+            var decryptedsex = decryptField(doctor.sex)
 
+            doctor.firstName=decryptedfirstName
+            doctor.lastName=decryptedlastName
+            doctor.specialty=decryptedspecialty
+            doctor.age=decryptedage
+            doctor.sex=decryptedsex
           }
-
           return businessNetworkConnection.disconnect();
         })
         .then(() => {
           if (exists) {
             res.json({
-              body : person,
-              message: 'Person has been retrieved successfully',
+              body : doctor,
+              message: 'Doctor has been retrieved successfully',
               dev_message: 'Success'
             });
           } else {
             res.json({
-              message: 'There is no such person'
+              message: 'There is no such doctor'
             });
           }
         })
@@ -162,17 +173,25 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Person")
+        return participantRegistry("ehr.com.Doctor")
       })
 
     .then(participantRegistry => {
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-      owner = factory.newResource('ehr.com', 'Person', req.params.id);
+      const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+      doctor = factory.newResource('ehr.com', 'Doctor', req.params.id);
       var firstnameenc = encryptField(req.body.firstName);
       var lastnameenc = encryptField(req.body.lastName);
-      owner.firstName = firstnameenc;
-      owner.lastName = lastnameenc;
-      return participantRegistry.update(owner);
+      var specialtyenc = encryptField(req.body.specialtyenc);
+      var ageenc = encryptField(req.body.age);
+      var sexenc = encryptField(req.body.sex);
+
+      doctor.firstName = firstnameenc;
+      doctor.lastName = lastnameenc;
+      doctor.specialty = specialtyenc;
+      doctor.age = ageenc;
+      doctor.sex = sexenc;
+
+      return participantRegistry.update(doctor);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();
@@ -180,8 +199,12 @@ router.put('/:id', function (req, res) {
     .then(() => {
       return res.json({
         status: 'OK, done!',
-        firstName : owner.firstName,
-        lastName : owner.lastName
+        firstName : doctor.firstName,
+        lastName : doctor.lastName,
+        specialty : doctor.specialty,
+        age : doctor.age,
+        sex : doctor.sex
+
 
     });
     })

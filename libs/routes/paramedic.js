@@ -56,27 +56,32 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Person")
+              return participantRegistry("ehr.com.Paramedics")
             })
 
           .then(participantRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-              owner = factory.newResource('ehr.com', 'Person', req.body.personId);
-              //owner.firstName = req.body.firstName;
-              var firstnameenc = encryptField(req.body.firstName);
-              var lastnameenc = encryptField(req.body.lastName);
-              owner.firstName = firstnameenc;
-              owner.lastName = lastnameenc;
+              paramedic = factory.newResource('ehr.com', 'Paramedics', req.body.paramedicId);
+              console.log("HIII")
+              console.log(paramedic)
+              //paramedic.firstName = req.body.firstName;
+              paramedic.reason = encryptField(req.body.reason);
+              paramedic.location = encryptField(req.body.location);
 
-              return participantRegistry.add(owner);
+
+              console.log("blah")
+              paramedic.patientId = factory.newRelationship('ehr.com', 'Patient', req.body.patientId);
+              console.log(paramedic.patientId)
+              console.log("huh?")
+              return participantRegistry.add(paramedic);
            })
 
             .then((err) => {
-              return issueIdentity("ehr.com", "Person", req.body.personId, req.body.personId + "_" + req.body.firstName);
+              return issueIdentity("ehr.com", "Paramedics", req.body.paramedicId, req.body.paramedicId + "_" + req.body.location);
             })
 
             .then(identity => {
-              return adminConnection.importCard(req.body.personId, getIdCard(createMetaData(identity)));
+              return adminConnection.importCard(req.body.paramedicId, getIdCard(createMetaData(identity)));
             })
 
             .then(() => {
@@ -86,8 +91,7 @@ router.post('/',  function (req, res) {
             .then(() => {
               return res.json({
                 status: 'OK, done!',
-                firstName : owner.firstName,
-                lastName : owner.lastName
+                body: paramedic
               });
         })
         .catch(errs => {
@@ -103,14 +107,14 @@ router.post('/',  function (req, res) {
 router.get('/:id', function (req, res) {
   let exists;
   let assets;
-  let person;
+  let paramedic;
   console.log("dfdk")
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
   return businessNetworkConnection.connect(req.params.id)
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
-            'ehr.com.Person');
+            'ehr.com.Paramedics');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
@@ -124,35 +128,31 @@ router.get('/:id', function (req, res) {
       })
       .then((result) => {
           if (exists) {
-            person = businessNetworkConnection.getBusinessNetwork()
+            paramedic = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
                        .toJSON(result);
-            var decryptedfirstName = decryptField(person.firstName)
-            var decryptedlastName = decryptField(person.lastName)
-            person.firstName=decryptedfirstName
-            person.lastName=decryptedlastName
-
+              paramedic.location = decryptField(paramedic.location)
+          paramedic.reason = decryptField(paramedic.reason)
           }
-
           return businessNetworkConnection.disconnect();
         })
         .then(() => {
           if (exists) {
             res.json({
-              body : person,
-              message: 'Person has been retrieved successfully',
+              body : paramedic,
+              message: 'paramedic has been retrieved successfully',
               dev_message: 'Success'
             });
           } else {
             res.json({
-              message: 'There is no such person'
+              message: 'There is no such paramedic'
             });
           }
         })
         .catch(err => {
           return res.json({
             error: {
-              message: err
+              message: err.toString()
             }
           });
 });
@@ -162,33 +162,31 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Person")
+        return participantRegistry("ehr.com.Paramedics")
       })
 
     .then(participantRegistry => {
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-      owner = factory.newResource('ehr.com', 'Person', req.params.id);
-      var firstnameenc = encryptField(req.body.firstName);
-      var lastnameenc = encryptField(req.body.lastName);
-      owner.firstName = firstnameenc;
-      owner.lastName = lastnameenc;
-      return participantRegistry.update(owner);
+      const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+      paramedic = factory.newResource('ehr.com', 'Paramedics', req.params.paramedicId);
+      paramedic.location = encryptField(req.body.location);
+      paramedic.reason = encryptField(req.body.reason);
+      paramedic.patientId = factory.newRelationship('ehr.com', 'Patient', req.body.patientId);
+
+      return participantRegistry.update(paramedic);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();
     })
     .then(() => {
       return res.json({
-        status: 'OK, done!',
-        firstName : owner.firstName,
-        lastName : owner.lastName
+        status: 'OK, done!'
 
     });
     })
     .catch(errs => {
           return res.json({
             error: {
-              message: 'Failed to update record'
+              message: errs.toString()
             }
           });
     });
