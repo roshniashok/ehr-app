@@ -16,7 +16,7 @@ const adminConnection = new AdminConnection();
 const businessNetworkName = 'ehr-app';
 const connectionProfile = require('./sample.json');
 
-const cardName = "admin@ehr-app";
+const cardName = "01";
 const businessNetworkIdentifier = "ehr-app@0.0.1";
 
 function encryptField(dataToEncrypt) {
@@ -111,7 +111,7 @@ router.get('/:id', function (req, res) {
   console.log("dfdk")
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
-  return businessNetworkConnection.connect(req.params.id)
+  return businessNetworkConnection.connect(cardName)
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
             'ehr.com.Paramedics');

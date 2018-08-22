@@ -1,53 +1,63 @@
 
 
-PERSON (TEST) :
+PERSON :
 
 http POST http://localhost:3000/ledger personId='01' firstName='Yesh' lastName='Kumar'
 http http://localhost:3000/ledger/01
 http PUT http://localhost:3000/ledger/01 firstName='Yeshie' lastName='Kuumar'
 
-http POST http://localhost:3000/doctor doctorId='02' firstName='Yesh' lastName='Kumar' specialty='Paeds' age='25' sex='M'
-http http://localhost:3000/doctor/02
-http PUT http://localhost:3000/doctor/02 firstName='Yeshie' lastName='Kuumar' specialty='Paeds' age='25' sex='M' patient='ehr.com.Patient#01'
+DOCTOR :
+http POST http://localhost:3000/doctor doctorId='01' firstName='Yesh' lastName='Kumar' specialty='Paeds' age='25' sex='M'
+http http://localhost:3000/doctor/01
+http PUT http://localhost:3000/doctor/01 firstName='Yeshie' lastName='Kuumar' specialty='Paeds' age='25' sex='M' patient='ehr.com.Patient#01'
 
-http POST http://localhost:3000/patient id='01' firstName='rosh' lastName='ashokkumar' age='25' sex='M' doctor='01'
-http http://localhost:3000/patient/01
-http PUT http://localhost:3000/patient/01 firstName='roshie' lastName='ashokKuumar' age='25' sex='M' doctor='01'
+PATIENT :
+http POST http://localhost:3000/patient id='02' firstName='rosh' lastName='ashokkumar' age='25' sex='M' doctor='01'
+http http://localhost:3000/patient/02
+http PUT http://localhost:3000/patient/02 firstName='roshie' lastName='ashokKuumar' age='25' sex='M' doctor='01'
 
-http POST http://localhost:3000/technician id='11' firstName='jon' lastName='snow' specialty='labtech' patient='01'
-http http://localhost:3000/technician/11
-http PUT http://localhost:3000/technician/1 firstName='priyaa' lastName='darshini' specialty='labtech' patient='01'
+TECHNICIAN :
+http POST http://localhost:3000/technician id='03' firstName='jon' lastName='snow' specialty='labtech' patient='02'
+http http://localhost:3000/technician/03
+http PUT http://localhost:3000/technician/03 firstName='priyaa' lastName='darshini' specialty='labtech' patient='02'
 
-http POST http://localhost:3000/pharmacist id='111' firstName='john' lastName='doe' specialty='medicines' patient='01'
-http http://localhost:3000/pharmacist/111
-http PUT http://localhost:3000/pharmacist/111 firstName='johhny' lastName='doe' specialty='medicines' patient='01'
+PHARMACIST :
+http POST http://localhost:3000/pharmacist id='04' firstName='john' lastName='doe' specialty='medicines' patient='02'
+http http://localhost:3000/pharmacist/04
+http PUT http://localhost:3000/pharmacist/04 firstName='johhny' lastName='doe' specialty='medicines' patient='02'
 
-http POST http://localhost:3000/insuranceProvider insuranceProviderId='117' name='john' location='kusu'
-http http://localhost:3000/insuranceProvider/111
-http PUT http://localhost:3000/insuranceProvider/117 name='johnny' location='kusu'
+INSURANCE PROVIDER :
+http POST http://localhost:3000/insuranceProvider insuranceProviderId='05' name='John' location='London'
+http http://localhost:3000/insuranceProvider/05
+http PUT http://localhost:3000/insuranceProvider/05 name='Johnny' location='London'
 
-http POST http://localhost:3000/paramedic paramedicId='223' reason='emergency' location='medicines' patientId='01'
-http http://localhost:3000/paramedic/222
-http PUT http://localhost:3000/pharmacist/111 firstName='johhny' lastName='doe' specialty='medicines' patient='01'
+PARAMEDIC :
+http POST http://localhost:3000/paramedic paramedicId='12' reason='emergency' location='medicines' patientId='02'
+http http://localhost:3000/paramedic/12
+http PUT http://localhost:3000/pharmacist/06 firstName='johhny' lastName='doe' specialty='medicines' patient='02'
 
-http POST http://localhost:3000/insuranceNotes insuranceProviderId='45' insuranceProvider='axa' Premium='yes' owner1='01' owner2='117'
-http http://localhost:3000/insuranceNotes/45
-http PUT http://localhost:3000/insuranceNotes/45 insuranceProvider='axa' Premium='no' owner1='01' owner2='117'
+INSURANCE NOTES:
+http POST http://localhost:3000/insuranceNotes insuranceProviderId='07' insuranceProvider='axa' Premium='yes' owner1='02' owner2='05'
+http http://localhost:3000/insuranceNotes/07
+http PUT http://localhost:3000/insuranceNotes/07 insuranceProvider='axa' Premium='no' owner1='02' owner2='05'
 
-http POST http://localhost:3000/prescriptionNote prescriptionNoteId='46' doctorName='Yesh' patientName='yes' notes='good' owner1='01' owner2='117'
-http http://localhost:3000/prescriptionNote/46
-http PUT http://localhost:3000/prescriptionNote/46 doctorName='Yeshie' patientName='yes' notes='good' owner1='01' owner2='117'
+PRESCRIPTION NOTES:
+http POST http://localhost:3000/prescriptionNote prescriptionNoteId='08' doctorName='Yesh' patientName='yes' notes='good' owner1='02' owner2='01'
+http http://localhost:3000/prescriptionNote/08
+http PUT http://localhost:3000/prescriptionNote/08 doctorName='Yeshie' patientName='yes' notes='good' owner1='02' owner2='01'
 
-http POST http://localhost:3000/labReport labReportId='47' labtechId='23' doctorName='Yesh' patientName='yes' notes='good' owner1='01' owner2='117'
-http http://localhost:3000/labReport/47
-http PUT http://localhost:3000/labReport/47 doctorName='Yeshie' patientName='yes' notes='good' owner1='01' owner2='117'
+LAB REPORT:
+http POST http://localhost:3000/labReport labReportId='09' labtechId='101' doctorName='Yesh' patientName='yes' notes='good' owner1='02' owner2='01'
+http http://localhost:3000/labReport/09
+http PUT http://localhost:3000/labReport/09 doctorName='Yeshie' patientName='yes' notes='good' owner1='02' owner2='01'
 
 
-http POST http://localhost:3000/record RecordId='001' firstName='23' lastName='Yesh' age='yes' sex='good' allergies='peanuts' prescription='46' report='47' insurance='45' owner1='01' owner2='02'
+RECORD:
+http POST http://localhost:3000/record RecordId='002' firstName='Rosh' lastName='Ashok' age='22' sex='F' allergies='peanuts' prescription='08' report='09' insurance='07' owner1='02' owner2='02'
 http http://localhost:3000/record/001
-http PUT http://localhost:3000/record/001 RecordId='001' firstName='23' lastName='Yesh' age='yes' sex='good' allergies='peanuts' prescription='46' report='47' insurance='45' owner1='01' owner2='02'
+http PUT http://localhost:3000/record/001 RecordId='001' firstName='Roshie' lastName='Ashok' age='22' sex='F' allergies='peanuts' prescription='08' report='09' insurance='07' owner1='02' owner2='01'
 
 
-
+AUTH:
 http POST http://localhost:1337/api/oauth/token grant_type=password client_id=android client_secret=SomeRandomCharsAndNumbers username=myapi password=abc1234
 http POST http://localhost:1337/api/oauth/token grant_type=refresh_token client_id=android client_secret=SomeRandomCharsAndNumbers refresh_token=49aba4ae0dcda0864ccc8009954156606c9eb963459ff51fac55128524a809f9

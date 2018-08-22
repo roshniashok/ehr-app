@@ -28,13 +28,13 @@ function decryptField(dataToDecrypt) {
   return CryptoJS.AES.decrypt(dataToDecrypt, 'secret key 123').toString(CryptoJS.enc.Utf8);
 }
 
-function participantRegistry(registryName) {
-  return businessNetworkConnection.getParticipantRegistry(registryName);
+function assetRegistry(registryName) {
+  return businessNetworkConnection.getAssetRegistry(registryName);
 }
 
 
-function issueIdentity(namespace, participant, id, cardName) {
-  return businessNetworkConnection.issueIdentity(namespace + '.' + participant + '#' + id, cardName)
+function issueIdentity(namespace, asset, id, cardName) {
+  return businessNetworkConnection.issueIdentity(namespace + '.' + asset + '#' + id, cardName)
 }
 
 
@@ -56,10 +56,10 @@ router.post('/',  function (req, res) {
         return businessNetworkConnection.connect(cardName)
 
           .then(() => {
-              return participantRegistry("ehr.com.Record")
+              return assetRegistry("ehr.com.Record")
             })
 
-          .then(participantRegistry => {
+          .then(assetRegistry => {
               const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
               record = factory.newResource('ehr.com', 'Record', req.body.RecordId);
               //record.firstName = req.body.firstName;
@@ -76,23 +76,15 @@ router.post('/',  function (req, res) {
               record.prescription = factory.newRelationship('ehr.com', 'prescriptionNote', req.body.prescription);
               record.report = factory.newRelationship('ehr.com', 'labReport', req.body.report);
               record.insurance = factory.newRelationship('ehr.com', 'insuranceNotes', req.body.insurance);
-              record.owner1 = factory.newRelationship('ehr.com', 'Record', req.body.owner1);
+              record.owner1 = factory.newRelationship('ehr.com', 'Patient', req.body.owner1);
               record.owner2 = factory.newRelationship('ehr.com', 'Doctor', req.body.owner2);
 
               console.log("Posting..");
               //record.record = factory.newResource('ehr.com', 'Record', req.body.id);
-              return participantRegistry.add(record);
+              return assetRegistry.add(record);
               console.log(record)
               console.log("Posted...")
            })
-
-            .then((err) => {
-              return issueIdentity("ehr.com", "Record", req.body.RecordId, req.body.RecordId + "_" + req.body.firstName);
-            })
-
-            .then(identity => {
-              return adminConnection.importCard(req.body.RecordId, getIdCard(createMetaData(identity)));
-            })
 
             .then(() => {
               return businessNetworkConnection.disconnect();
@@ -123,7 +115,7 @@ router.get('/:id', function (req, res) {
   const businessNetworkConnection = new BusinessNetworkConnection();
   return businessNetworkConnection.connect(cardName)
     .then(() => {
-        return businessNetworkConnection.getParticipantRegistry(
+        return businessNetworkConnection.getAssetRegistry(
             'ehr.com.Record');
       })
     .then(assetRegistry => {
@@ -183,10 +175,10 @@ router.put('/:id', function (req, res) {
   return businessNetworkConnection.connect(cardName)
 
     .then(() => {
-        return participantRegistry("ehr.com.Record")
+        return assetRegistry("ehr.com.Record")
       })
 
-    .then(participantRegistry => {
+    .then(assetRegistry => {
       const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
       record = factory.newResource('ehr.com', 'Record', req.params.id);
       var firstnameenc = encryptField(req.body.firstName);
@@ -205,7 +197,7 @@ router.put('/:id', function (req, res) {
       record.owner1 = factory.newRelationship('ehr.com', 'Record', req.body.owner1);
       record.owner2 = factory.newRelationship('ehr.com', 'Doctor', req.body.owner2);
 
-      return participantRegistry.update(record);
+      return assetRegistry.update(record);
     })
     .then(() => {
       return businessNetworkConnection.disconnect();

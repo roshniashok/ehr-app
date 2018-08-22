@@ -75,14 +75,6 @@ router.post('/',  function (req, res) {
               return assetRegistry.add(labreport);
            })
 
-            .then((err) => {
-              return issueIdentity("ehr.com", "labReport", req.body.labReportId, req.body.labReportId + "_" + req.body.firstName);
-            })
-
-            .then(identity => {
-              return adminConnection.importCard(req.body.labReportId, getIdCard(createMetaData(identity)));
-            })
-
             .then(() => {
               return businessNetworkConnection.disconnect();
             })
@@ -109,7 +101,7 @@ router.get('/:id', function (req, res) {
   console.log("dfdk")
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
-  return businessNetworkConnection.connect(req.params.id)
+  return businessNetworkConnection.connect(cardName)
     .then(() => {
         return businessNetworkConnection.getAssetRegistry(
             'ehr.com.labReport');

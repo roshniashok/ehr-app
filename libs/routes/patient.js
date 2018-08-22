@@ -115,14 +115,14 @@ router.get('/:id', function (req, res) {
   let patient;
   const BusinessNetworkConnection = require('composer-client').BusinessNetworkConnection;
   const businessNetworkConnection = new BusinessNetworkConnection();
-  return businessNetworkConnection.connect(cardName)
+  return businessNetworkConnection.connect("01")
     .then(() => {
         return businessNetworkConnection.getParticipantRegistry(
             'ehr.com.Patient');
       })
     .then(assetRegistry => {
         assets=assetRegistry;
-        return assetRegistry.exists(req.params.id);
+        return assetRegistry.get(req.params.id);
       })
       .then((result) => {
         exists = result;
@@ -130,7 +130,7 @@ router.get('/:id', function (req, res) {
           return assets.get(req.params.id);
         }
       })
-      .then((result) => {
+      .then(() => {
           if (exists) {
             patient = businessNetworkConnection.getBusinessNetwork()
                        .getSerializer()
@@ -157,7 +157,8 @@ router.get('/:id', function (req, res) {
               message: 'patient has been retrieved successfully',
               dev_message: 'Success'
             });
-          } else {
+          }
+          else {
             res.json({
               message: 'There is no such patient'
             });
@@ -166,7 +167,7 @@ router.get('/:id', function (req, res) {
         .catch(err => {
           return res.json({
             error: {
-              message: err
+              message: err.toString()
             }
           });
 });

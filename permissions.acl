@@ -68,13 +68,16 @@ rule R1_PatientsCanUpdateTheirOwnRecord {
   action: ALLOW
 }
 
-rule AllAccess {
-  description: "AllAccess - grant everything to everybody"
-  participant: "org.hyperledger.composer.system.Participant"
-  operation: ALL
-  resource: "org.hyperledger.composer.system.**"
-  action: ALLOW
+
+
+rule SimpleRule {
+description: "Description of the ACL rule"
+participant: "ANY"
+operation: ALL
+resource: "ehr.com.*"
+action: ALLOW
 }
+
 
 rule SystemACL {
   description:  "System ACL to permit all access"
